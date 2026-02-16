@@ -1,0 +1,21 @@
+import pandas as pd
+
+
+def add_metrics(df: pd.DataFrame) -> pd.DataFrame:
+    out = df.copy()
+
+    # Basic “value”
+    out["points_per_million"] = out["total_points"] / out["price"].replace(0, pd.NA)
+
+    # Minutes per “appearance proxy”
+    out["minutes_score"] = out["minutes"] / out["minutes"].max() if out["minutes"].max() else 0
+
+    # A simple composite score (beginner-friendly)
+    # You can tweak weights later
+    out["fpl_score"] = (
+        0.45 * out["points_per_million"].fillna(0)
+        + 0.35 * out["form"].fillna(0)
+        + 0.20 * out["minutes_score"].fillna(0)
+    )
+
+    return out
